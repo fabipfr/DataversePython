@@ -142,3 +142,61 @@ class DataverseClient:
                 self.logger.error(f"Insert failed for row {idx}. Error code: {r.status_code}. Response: {r.content.decode('utf-8')}")
             else:
                 self.logger.info(f"Row {idx} inserted successfully into entity '{entity}'.")
+    
+    def upsert_rows(self, entity: str, df: pd.DataFrame, primary_key_col: str, only_update_if_exists: bool = False) -> None:
+        """
+        Upserts rows for a specified Dynamics 365 entity based on the provided DataFrame.
+        This function renames the provided primary key column in the DataFrame to "GUID",
+        converts the remaining data to a list of JSON records, and writes these records to "result.json".
+        It then iterates over each row of the DataFrame, constructs a PATCH request to update the
+        entity identified by the GUID at the corresponding API endpoint, and updates the row.
+        Successes and failures are tracked and printed during the process.
+        Args:
+            entity (str):
+                The name of the Dynamics 365 entity to update.
+            df (pandas.DataFrame):
+                DataFrame containing the rows to upsert. Must include a column representing the primary key.
+            primary_key_col (str):
+                The name of the DataFrame column that contains the unique identifier for each row.
+            only_update_if_exists (bool, optional):
+                If True, the function will only update existing records and will not create new ones.
+        """        
+        upsert_headers = dict(self.session.headers)
+        if only_update_if_exists:
+            upsert_headers.update({'If-Match': '*'})
+        upsert_headers.update({'If-None-Match': '*'})
+
+        records = json.loads(df.drop(columns='GUID').to_json(orient="records"))
+
+        successful_updates = 0
+        failures = 0
+        expected_updates = len(df)
+
+        for idx, (_, row) in enumerate(df.iterrows()):
+            guid = row[f'{primary_key_col}']
+            requestURI = f'{self.environmentURI}api/data/v9.2/{entity}({guid})'
+            payload = records[idx]
+
+            for key, value in payload.items():
+                if isinstance(value, str):
+                    if value.lower() == "false":
+                        payload[key] = False
+                    elif value.lower() == "true":
+                        payload[key] = True
+            
+            # Filter out keys with None values to prevent sending undeclared properties
+            payload = {k: v for k, v in payload.items() if pd.notna(v)}
+
+            r = self.session.patch(requestURI, headers=upsert_headers, json=payload)
+            
+
+            if r.status_code != 204:
+                failures += 1
+                self.logger.error(f'Error updating {guid}. Error {r.status_code}: \n{r.content.decode('utf-8')}\n')
+            else:
+                successful_updates += 1
+
+            if idx % 10 == 0:
+                self.logger.debug(f"Processed: {idx + 1}")
+
+        self.logger.info(f'{successful_updates} updates made of {expected_updates} expected updates.\n{failures} failures.')
