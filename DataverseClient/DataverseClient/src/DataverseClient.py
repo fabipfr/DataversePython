@@ -242,4 +242,83 @@ class DataverseClient:
                 print(f"Processed: {idx + 1}") # type: ignore
                 
         print(f'{successful_updates} updates made of {expected_updates} expected updates.\n{failures} failures.') 
+
+    def merge_rows(self, entity: Literal["account", "contact"], df:pd.DataFrame, is_master_col: str, duplicate_family_col: str, perform_parenting_checks:bool = True, primary_key_col = None) -> None:
+        """
+        Merges duplicate rows into master record in Microsoft Dataverse.
+        This function identifies master and subordinate records in the provided DataFrame based on the `is_master_col` and `duplicate_family_col` columns.
+        For each master record, it merges all subordinate records that share the same duplicate family ID into the master record using the Dataverse Merge API.
+        Args:
+            entity (Literal["account", "contact"]): The Dataverse entity type to merge (e.g., "account" or "contact").
+            df (pd.DataFrame): The DataFrame containing records to be merged. Must include columns for master/subordinate identification and duplicate family grouping.
+            is_master_col (str): The name of the column indicating whether a row is a master record (True) or subordinate (False).
+            duplicate_family_col (str): The name of the column that groups records into duplicate families.
+            perform_parenting_checks (bool, optional): Whether to perform parenting checks during the merge. Defaults to True.
+            primary_key_col (str, optional): The name of the primary key column. If None, defaults to '{entity}id'.
+        Note:
+            This function sends HTTP POST requests to the Dataverse Merge API for each subordinate to be merged into its master.
+            The DataFrame is expected to be pre-processed to identify master and subordinate records.
+        """
+        merge_headers = dict(self.session.headers)
+        merge_headers.update({'Content-Type': 'application/json; charset=utf-8'})
         
+        requestURI = f'{self.environmentURI}api/data/v9.2/Merge'
+        
+        masterDF = df[df[is_master_col] == True]
+        subordinateDF = df[df[is_master_col] == False]
+
+
+        for idx, row in masterDF.iterrows():
+            if primary_key_col is None:
+                masterID: str = row[f'{entity}id']
+            else:
+                masterID: str = row[str(primary_key_col)]
+
+            completeRow = row.to_dict()
+            completeRow['@odata.type'] = f"Microsoft.Dynamics.CRM.{entity}"
+            completeRow.pop(is_master_col, None)
+            completeRow.pop(duplicate_family_col, None)
+            if primary_key_col is None:
+                completeRow.pop(f'{entity}id', None)
+            else:
+                completeRow.pop(primary_key_col, None)
+
+            duplicateFamilyID = row[duplicate_family_col]
+            subordinates = subordinateDF[subordinateDF[duplicate_family_col] == duplicateFamilyID]
+            
+            if len(subordinates) == 0:
+                self.logger.warning(f"No subordinates found for master ID: {masterID} with duplicate family ID: {duplicateFamilyID}. Skipping merge.")
+                continue
+
+            self.logger.debug(f"Processing master ID: {masterID} with duplicate family ID: {duplicateFamilyID} found: {len(subordinates)} subordinates.")
+            self.logger.debug(completeRow)
+
+            for subordinateIdx, subordinateRow in subordinates.iterrows():
+                if primary_key_col is None:
+                    subordinateID: str = subordinateRow[f'{entity}id']
+                else:
+                    subordinateID: str = subordinateRow[primary_key_col]
+                
+                payload = {
+                    "Target": {
+                        "@odata.type": f"Microsoft.Dynamics.CRM.{entity}",
+                        f"{entity}id": masterID
+                    },
+                    "Subordinate": {
+                        "@odata.type": f"Microsoft.Dynamics.CRM.{entity}",
+                        f"{entity}id": subordinateID
+                    },
+                    "UpdateContent": completeRow,
+                    "PerformParentingChecks": perform_parenting_checks
+                }
+
+                r = self.session.post(url=requestURI, headers=merge_headers, json=payload)
+        
+                self.logger.debug(f"requestURI: {r.request.method.upper()} {requestURI}") # type: ignore
+                self.logger.debug(f"Headers: {merge_headers}")
+                self.logger.debug(f"payload: {json.dumps(payload, indent=4)}")
+
+                if r.status_code != 204:
+                    self.logger.error(f"Request failed. Error code: {r.status_code}. Response: {r.content.decode('utf-8')}")
+                else:
+                    self.logger.debug(f"Request successful")
