@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: DataversePython
+Version: 0.1.1
+Summary: A Dataverse client for Python
+Home-page: https://github.com/fabipfr/DataversePython
+Author: fabipfr
+Author-email: contact@fabianpfriem.com
+Requires-Python: >=3.10
+Requires-Dist: requests>=2.32.4
+Requires-Dist: pandas>=2.2.3
+Requires-Dist: numpy>=2.2.5
+Requires-Dist: msal>=1.33.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

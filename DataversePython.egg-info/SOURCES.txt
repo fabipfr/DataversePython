@@ -1,0 +1,9 @@
+README.md
+setup.py
+DataversePython/DataverseClient.py
+DataversePython/__init__.py
+DataversePython.egg-info/PKG-INFO
+DataversePython.egg-info/SOURCES.txt
+DataversePython.egg-info/dependency_links.txt
+DataversePython.egg-info/requires.txt
+DataversePython.egg-info/top_level.txt
