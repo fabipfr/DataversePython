@@ -66,6 +66,19 @@ class DataverseClient:
             raise Exception(f"Authentication failed: {result.get('error')}, {result.get('error_description')}")
         
     def get_rows(self, entity: str, top: int | None = None, columns: list = [], filter: str | None = None, include_odata_annotations: bool = False) -> pd.DataFrame:
+        """
+        Retrieves rows from a specified Dataverse entity and returns them as a pandas DataFrame.
+        Args:
+            entity (str): The logical name of the Dataverse entity to query. Use PLURAL form (e.g. accounts, contacts).
+            top (int, optional): The maximum number of rows to retrieve. If None, retrieves all available rows.
+            columns (list, optional): List of column names to select. If empty, all columns are retrieved.
+            filter (str, optional): OData filter string to apply to the query. If None, no filter is applied.
+            include_odata_annotations (bool, optional): If True, includes OData annotations in the response. When using columns, odata annotations are also filtered.
+        Returns:
+            pd.DataFrame: A DataFrame containing the retrieved rows from the specified entity.
+        Raises:
+            Exception: If the HTTP request to the Dataverse API fails.
+        """
         get_headers = self.session.headers.copy() # type: ignore
         if include_odata_annotations:
             get_headers.update({'Prefer': 'odata.include-annotations=*'})
