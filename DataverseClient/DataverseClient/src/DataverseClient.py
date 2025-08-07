@@ -117,3 +117,28 @@ class DataverseClient:
                     df = pd.concat([df, pd.DataFrame(rows)], ignore_index=True)
             self.logger.info(f"Retrieved {len(df)} rows from entity '{entity}'.")
             return df
+        
+    def insert_rows(self, entity:str, df: pd.DataFrame) -> None:
+        """
+        Inserts rows from a pandas DataFrame into a specified Dataverse entity.
+        Args:
+            entity (str): The logical name of the Dataverse entity to insert rows into.
+            df (pd.DataFrame): The DataFrame containing the rows to be inserted. Each row should match the entity's schema.
+        Notes:
+            - Each row in the DataFrame is converted to a JSON payload and sent as a POST request to the Dataverse Web API.
+            - The method logs an error if the insertion of a row fails (status code != 204), including the error code and response content.
+            - On successful insertion (status code == 204), an info log is created for the row.
+        """
+        insert_headers = dict(self.session.headers)
+        insert_headers.update({'Content-Type': 'application/json; charset=utf-8'})
+
+        requestURI = f'{self.environmentURI}api/data/v9.2/{entity}'
+
+        for idx, row in df.iterrows():
+            payload = json.loads(row.to_json())
+            r = self.session.post(url=requestURI, headers=insert_headers, json=payload)
+
+            if r.status_code != 204:
+                self.logger.error(f"Insert failed for row {idx}. Error code: {r.status_code}. Response: {r.content.decode('utf-8')}")
+            else:
+                self.logger.info(f"Row {idx} inserted successfully into entity '{entity}'.")
