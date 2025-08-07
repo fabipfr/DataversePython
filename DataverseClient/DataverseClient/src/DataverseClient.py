@@ -200,3 +200,46 @@ class DataverseClient:
                 self.logger.debug(f"Processed: {idx + 1}")
 
         self.logger.info(f'{successful_updates} updates made of {expected_updates} expected updates.\n{failures} failures.')
+
+    def insert_m_n(self, entity_m: str, entity_n: str, relationship_name: str, df: pd.DataFrame) -> None:
+        """
+        Creates many-to-many relationships between two entities using data from a DataFrame.
+        This function iterates over each row of the provided DataFrame and establishes a relationship between records identified by
+        the specified entity column names. For each row, it builds the necessary API endpoint URLs and sends a POST request to connect
+        the respective records. The function prints progress messages every 10 processed records and outputs error details when a
+        request fails. At the end, it summarizes the number of successful and failed relationship creations.
+        Args:
+            entity_m (str): Name of the source entity column in the DataFrame, used to construct the primary record reference.
+            entity_n (str): Name of the target entity column in the DataFrame, used to construct the related record reference.
+            m_to_n_relationship (str): The relationship name that defines how entity_m is related to entity_n in the API.
+            df (pd.DataFrame): A DataFrame containing rows with column names matching entity_m and entity_n. Each row represents a pair
+                               of records to be linked.
+        """
+        insert_m_n_headers = dict(self.session.headers)
+
+        successful_updates = 0
+        failures = 0
+        expected_updates = len(df)
+
+        for idx, row in df.iterrows():
+            record_m = row[entity_m]
+            record_n = row[entity_n]
+            
+            requestURI = f'{self.environmentURI}api/data/v9.2/{entity_m}({record_m})/{relationship_name}/$ref'
+            odata_id = f'{self.environmentURI}api/data/v9.2/{entity_n}({record_n})'
+            payload = { "@odata.id": odata_id }
+
+            r = self.session.post(requestURI, headers=insert_m_n_headers, json=payload)
+            
+            if r.status_code != 204:
+                failures += 1
+                logging.error(f'Error linking {record_m} to {record_n}. Error {r.status_code}: \n{r.content.decode('utf-8')}\n')
+            
+            else:
+                successful_updates += 1
+                
+            if idx % 10 == 0: # type: ignore
+                print(f"Processed: {idx + 1}") # type: ignore
+                
+        print(f'{successful_updates} updates made of {expected_updates} expected updates.\n{failures} failures.') 
+        
