@@ -164,7 +164,8 @@ class DataverseClient:
         upsert_headers = dict(self.session.headers)
         if only_update_if_exists:
             upsert_headers.update({'If-Match': '*'})
-        upsert_headers.update({'If-None-Match': '*'})
+        else:
+            upsert_headers.update({'If-None-Match': '*'})
 
         records = json.loads(df.drop(columns=f'{primary_key_col}').to_json(orient="records"))
 
