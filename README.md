@@ -61,8 +61,8 @@ All operations and errors are logged to `DataverseClient.log` in the project roo
 
 Below are some useful resources and documentation that were referenced during the development of this module:
 
+- [PyConnectDataverse](https://github.com/YesWeCandrew/PyConnectDataverse)
 - [Microsoft Dataverse documentation](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/webapi/overview)
-- [MSAL Python documentation](https://github.com/AzureAD/microsoft-authentication-library-for-python)
 - [Azure App Registration documentation](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app)
 - [Pandas documentation](https://pandas.pydata.org/docs/)
 
