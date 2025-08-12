@@ -23,8 +23,13 @@ from DataversePython import DataverseClient
 
 ## Usage
 
-1. **Configure Authentication**
-    - Create a JSON config file (see `sample_config.json`) with your Azure app registration and Dataverse environment details. The config JSON looks like this:
+1. **Setup**
+    
+    1. Create the required Azure app registration, see [`App Registration Guide`](./APP_REGISTRATION.md).
+    
+    2. Add the created Service Principal (App Registration) as an application user your environments, see [`Add Application User Guide`](./APPLICATION_USER.md)
+
+    3. Create a JSON config file (see [sample_config.json](./sample_config.json)) with your Azure app registration and Dataverse environment details. The config JSON looks like this:
         ```json
         {
         "environmentURI": "https://<your-org>.crm.dynamics.com/",
@@ -34,7 +39,6 @@ from DataversePython import DataverseClient
         "tenantID": "<your-tenant-id>"
         }
         ```
-    - For instructions on creating the required Azure app registration, see [App Registration Guide](./APP_REGISTRATION.md) *(to be provided)*.
 
 2. **Basic Example**
     ```python
