@@ -65,6 +65,7 @@ All operations and errors are logged to `DataverseClient.log` in the project roo
 ## Tips for Using DataversePython
 
 - **Visualize and Explore DataFrames Easily**: Install the [Data Wrangler extension](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.datawrangler) in VS Code to interactively view, clean, and analyze pandas DataFrames. This makes it much easier to inspect and manipulate your data when working with Dataverse records.
+![Datawrangler](https://github.com/user-attachments/assets/b90a67c5-a286-433b-b457-3cc879ba7fcb)
 
 - **Work Interactively with Notebooks**: For the best experience, use Jupyter (`.ipynb`) notebooks in VS Code. Notebooks allow you to run code in cells, visualize results, and document your workflow, making it ideal for data exploration and Dataverse integration tasks.
 
