@@ -12,7 +12,7 @@ setup(
     author_email="contact@fabianpfriem.com",
     packages=find_packages(),
     long_description=long_description,
-    long_description_content_type='text/markdown'
+    long_description_content_type="text/markdown",
     install_requires=[
         "requests >= 2.32.4",
         "pandas >= 2.2.3",
