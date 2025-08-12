@@ -1,7 +1,7 @@
 {
-    "clientID": "00000000-0000-0000-0000-000000000000",
-    "tenantID": "00000000-0000-0000-0000-000000000000",
-    "environmentURI": "https://YOURORG.crm.dynamics.com/",
+    "clientID": "<your-client-id>",
+    "tenantID": "<your-tenant-id>",
+    "environmentURI": "https://<your-org>.crm.dynamics.com/",
     "authorityBase": "https://login.microsoftonline.com/",
     "scopeSuffix": "user_impersonation"
 }
