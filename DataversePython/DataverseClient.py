@@ -122,7 +122,7 @@ class DataverseClient:
         """
         Inserts rows from a pandas DataFrame into a specified Dataverse entity.
         Args:
-            entity (str): The logical name of the Dataverse entity to insert rows into.
+            entity (str): The logical name of the Dataverse entity to insert rows into. Use PLURAL form (e.g. accounts, contacts).
             df (pd.DataFrame): The DataFrame containing the rows to be inserted. Each row should match the entity's schema.
         Notes:
             - Each row in the DataFrame is converted to a JSON payload and sent as a POST request to the Dataverse Web API.
@@ -153,7 +153,7 @@ class DataverseClient:
         Successes and failures are tracked and printed during the process.
         Args:
             entity (str):
-                The name of the Dynamics 365 entity to update.
+                The name of the Dynamics 365 entity to update. Use PLURAL form (e.g. accounts, contacts).
             df (pandas.DataFrame):
                 DataFrame containing the rows to upsert. Must include a column representing the primary key.
             primary_key_col (str):
@@ -166,7 +166,7 @@ class DataverseClient:
             upsert_headers.update({'If-Match': '*'})
         upsert_headers.update({'If-None-Match': '*'})
 
-        records = json.loads(df.drop(columns='GUID').to_json(orient="records"))
+        records = json.loads(df.drop(columns=f'{primary_key_col}').to_json(orient="records"))
 
         successful_updates = 0
         failures = 0
