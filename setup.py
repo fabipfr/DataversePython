@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="DataversePython",
-    version="0.1.1",
+    version="0.1.2",
     description="A Dataverse client for Python",
     url="https://github.com/fabipfr/DataversePython",
     author="fabipfr",
