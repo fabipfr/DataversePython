@@ -145,12 +145,11 @@ class DataverseClient:
     
     def upsert_rows(self, entity: str, df: pd.DataFrame, primary_key_col: str, only_update_if_exists: bool = False) -> None:
         """
-        Upserts rows for a specified Dynamics 365 entity based on the provided DataFrame.
-        This function renames the provided primary key column in the DataFrame to "GUID",
-        converts the remaining data to a list of JSON records, and writes these records to "result.json".
-        It then iterates over each row of the DataFrame, constructs a PATCH request to update the
-        entity identified by the GUID at the corresponding API endpoint, and updates the row.
-        Successes and failures are tracked and printed during the process.
+        Upserts rows for a specified Dynamics 365 entity using data from a pandas DataFrame.
+        This method iterates over each row in the provided DataFrame, constructs a PATCH request for each record,
+        and updates the corresponding entity in Dynamics 365 based on the primary key. The method can be configured
+        to only update existing records or to create new ones if they do not exist. It tracks and logs the number
+        of successful updates and failures.
         Args:
             entity (str):
                 The name of the Dynamics 365 entity to update. Use PLURAL form (e.g. accounts, contacts).
@@ -323,3 +322,4 @@ class DataverseClient:
                     self.logger.error(f"Request failed. Error code: {r.status_code}. Response: {r.content.decode('utf-8')}")
                 else:
                     self.logger.debug(f"Request successful")
+
