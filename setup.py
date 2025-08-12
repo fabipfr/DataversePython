@@ -5,7 +5,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="DataversePython",
-    version="0.1.5",
+    version="1.0.0",
     description="A Dataverse client for Python",
     url="https://github.com/fabipfr/DataversePython",
     author="fabipfr",
