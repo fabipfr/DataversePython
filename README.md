@@ -54,8 +54,14 @@ from DataversePython import DataverseClient
     print(df.head())
     ```
 
-3. **Insert, Upsert, Merge, and Many-to-Many**
+3. **Get, Insert, Upsert, Merge, and Many-to-Many**
     - See docstrings in `DataverseClient.py` for details on each method.
+    - Go to my [blog](https://blog.fabianpfriem.com) to see detailed examples:
+        - [get_rows()](https://blog.fabianpfriem.com/2025/08/how-to-getrows-in-dataversepython.html)
+        - [insert_rows()](https://blog.fabianpfriem.com/2025/08/how-to-insertrows-in-dataversepython.html)
+        - [upsert_rows()](https://blog.fabianpfriem.com/2025/08/how-to-upsertrows-in-dataversepython.html) (coming soon)
+        - [insert_m_n()](https://blog.fabianpfriem.com/2025/08/how-to-insertmn-in-dataversepython.html) (coming soon)
+        - [merge_rows()](https://blog.fabianpfriem.com/2025/08/how-to-mergerows-in-dataversepython.html) (coming soon)
 
 ## Logging
 
